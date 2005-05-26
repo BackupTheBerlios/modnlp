@@ -1,0 +1,7 @@
+- use gnu.getopt to handle our ever increasing set of options. 
+
+- split BVProbabilityModel into two separate classes one extending
+  TCProbabilityModel and one implementing TCInvertedIndex
+
+- implement a word-position event probability model and a classifier
+  the uses it
