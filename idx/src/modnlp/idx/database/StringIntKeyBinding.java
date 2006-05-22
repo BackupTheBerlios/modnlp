@@ -26,7 +26,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
  *  the key for WordPositionTable)
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: StringIntKeyBinding.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: StringIntKeyBinding.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 

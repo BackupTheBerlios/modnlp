@@ -22,6 +22,7 @@ import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.StringBinding;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.DeadlockException;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.DatabaseEntry;
@@ -38,7 +39,7 @@ import com.sleepycat.je.LockMode;
  *  </pre>
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: WordFileTable.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: WordFileTable.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  Dictionary
 */
 public class WordFileTable extends Table {
@@ -75,7 +76,7 @@ public class WordFileTable extends Table {
       put(key,data);
     }
     catch (DatabaseException e) {
-      logf.println("Error reading WordFileTable" + e);
+      logf.logMsg("Error reading WordFileTable" + e);
     }
     return set;
   }
@@ -99,12 +100,28 @@ public class WordFileTable extends Table {
       put(key,data);
     }
     catch (DatabaseException e) {
-      logf.println("Error updating WordFileTable" + e);
+      logf.logMsg("Error updating WordFileTable" + e);
     }
     return set;
   }
 
-
+  public IntegerSet fetch (String sik) {
+    TupleBinding isb = new IntegerSetBinding();
+    DatabaseEntry key = new DatabaseEntry();
+    DatabaseEntry data = new DatabaseEntry();
+    IntegerSet set = null;
+    StringBinding.stringToEntry(sik.toLowerCase(), key);
+    try {
+      if (database.get(null,key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) 
+        set = (IntegerSet)isb.entryToObject(data);
+    } catch(DeadlockException e) {
+      logf.logMsg("Deadlock reading from dbname:"+e);
+    }
+    catch(DatabaseException e) {
+      logf.logMsg("Error reading from DB "+dbname+": "+e);
+    }
+    return set;
+  }
 
   public void  dump () {
     try {
@@ -122,7 +139,7 @@ public class WordFileTable extends Table {
       c.close();
     }
     catch (DatabaseException e) {
-      logf.println("Error accessing WordFileTable" + e);
+      logf.logMsg("Error accessing WordFileTable" + e);
     }
   }
 

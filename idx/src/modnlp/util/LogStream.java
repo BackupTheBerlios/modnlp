@@ -24,7 +24,7 @@ import java.util.Date;
  *  Handle error messages 
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: LogStream.java,v 1.1 2006/05/22 16:55:05 amaral Exp $</font>
+ * @version <font size=-1>$Id: LogStream.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 public class LogStream extends 
@@ -63,8 +63,27 @@ PrintWriter {
     this.flush();
   }
 
+  /** Write <code>msg</code> into this logfile and 
+   *  print msg to stderr id <code>debugOn</code>
+   */
+  public void logMsg (Object msg, Exception e){
+    msg = msg+": "+e+" ["+(new Date())+"]";
+    this.println(msg);
+    dbgMsg(msg, e);
+    this.flush();
+  }
+
+
   public void dbgMsg (Object msg){
     if (debugOn)
       System.err.println(msg);
   }
+
+  public void dbgMsg (Object msg, Exception e){
+    if (debugOn) {
+      System.err.println(msg);
+      e.printStackTrace(System.err);
+    }
+  }
+
 }

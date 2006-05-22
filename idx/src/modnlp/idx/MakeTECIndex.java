@@ -30,7 +30,7 @@ import java.util.Enumeration;
  *  frequency tables for use with TEC
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: MakeTECIndex.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: MakeTECIndex.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 public class MakeTECIndex {
@@ -65,14 +65,15 @@ public class MakeTECIndex {
           System.err.println("Ignoring this entry.");
         }
       } // end for
-      // d.dump();
+      //d.dump();
+      //d.printSortedFreqList(new java.io.PrintWriter(System.out));
       d.close();
     } // end try
     catch (Exception ex){
-      if (d != null)
-        d.close();
       System.err.println(ex);
       ex.printStackTrace();
+      if (d != null)
+        d.close();
       usage();
     }
   }

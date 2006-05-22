@@ -15,42 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
-package modnlp.util;
+package modnlp.dstruct;
+import java.util.LinkedHashSet;
+import java.util.Iterator;
+
 
 /**
- *   Print and display utilities for the command line interface
+ *  Store strings  
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: PrintUtil.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
- * @see  
+ * @version <font size=-1>$Id: StringSet.java,v 1.1 2006/05/22 17:26:02 amaral Exp $</font>
+ * @see WordFileTable
+ * @see CaseTable
 */
 
-public class PrintUtil {
+public class StringSet extends LinkedHashSet {
 
-  private static int prevsize = 0;
-
-  public static void resetCounter ()
-  {
-    prevsize = 0;
-  }
-
-  public static void donePrinting(){
-    System.err.println("...done");
-    resetCounter();
-  }
-
-  public static void printNoMove(String header, int counter)
-  {
-    if ( prevsize == 0 )
-      System.err.print(header+counter);
-    else {
-      for ( int i = 0; i < prevsize ; i++)
-        System.err.print("\b");
-      System.err.print(counter);
-    }
-    prevsize = (new String(counter+"")).length();
-    //for (int i = 0 ; i < 100000; i++)
-    //  System.out.print("");
+  public String toString() {
+    StringBuffer sb = new StringBuffer();
+    for (Iterator f = this.iterator(); f.hasNext() ;)
+      sb.append(f.next()+" ");
+    return sb.toString();
   }
 
 

@@ -17,37 +17,52 @@
 */
 package modnlp.dstruct;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Vector;
+import java.util.Collection;
+
 /**
- *  List of filenames (full path) in the corpus
+ *  Store all forms of a keyword (or wildcard)
  *
- * @author  S. Luz &#60;luzs@acm.org&#62;
- * @version <font size=-1>$Id: CorpusList.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
+ * 
+ * @author  Saturnino Luz &#60;luzs@acm.org&#62;
+ * @version <font size=-1>$Id: WordForms.java,v 1.1 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
-public class CorpusList extends  Vector
-{
+public class WordForms extends Vector {
 
-  public CorpusList (String flist) 
-  {
+  String keyword;
+  
+
+  public WordForms (String key) {
     super();
-    try {
-      BufferedReader in
-        = new BufferedReader(new FileReader(flist));
-      String fname = null;
-      while ( (fname = in.readLine()) != null )
-        {
-          if (fname.charAt(0) == '#')
-            continue;
-          this.add(fname);
-        }
-    }
-    catch (IOException e){
-      System.err.println("Error reading corpus list "+flist);
-      e.printStackTrace();
-    }
+    this.keyword = key;
   }
+
+  public WordForms () {
+    super();
+    this.keyword = null;
+  }
+
+  public WordForms (String k, Collection c) {
+    super(c);
+    this.keyword = k;
+  }
+
+  /**
+   * Get the value of keyword.
+   * @return value of keyword.
+   */
+  public String getKeyword() {
+    return keyword;
+  }
+  
+  /**
+   * Set the value of keyword.
+   * @param v  Value to assign to keyword.
+   */
+  public void setKeyword(String  v) {
+    this.keyword = v;
+  }
+
+
 }

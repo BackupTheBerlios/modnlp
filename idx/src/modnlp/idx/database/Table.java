@@ -34,7 +34,7 @@ import java.io.IOException;
  *  complicated stuff from the rest of the system)
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: Table.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: Table.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 
@@ -69,19 +69,25 @@ abstract class Table  {
                                           fn,
                                           dbc);
     } catch (DatabaseNotFoundException e) {
-      logf.logMsg("DB file "+fn+" not found: "+e);
+      logf.logMsg("DB file "+fn+" not found: ",e);
     } catch(DatabaseException e) {
-      logf.logMsg("Error accessing DB "+fn+": "+e);
+      logf.logMsg("Error accessing DB "+fn,e);
     } 
+  }
+
+  public void finalize () {
+    close();
   }
 
   public void close () {
     // ignore operation status
     try {
-      database.close();
-
+      if (database != null ){
+        database.close();
+        database = null;
+      }
     } catch(DatabaseException e) {
-      logf.println("Error putting into DB "+dbname+": "+e);
+      logf.logMsg("Error closing DB "+dbname,e);
     }
   }
 
@@ -91,7 +97,7 @@ abstract class Table  {
       database.put(null,key,val);
 
     } catch(DatabaseException e) {
-      logf.println("Error putting into DB "+dbname+": "+e);
+      logf.logMsg("Error putting into DB "+dbname,e);
     }
   }
 
@@ -101,10 +107,22 @@ abstract class Table  {
       database.delete(null,key);
 
     } catch(DeadlockException e) {
-      logf.println("Deadlock while removing from DB "+dbname+": "+e);
+      logf.logMsg("Deadlock while removing from DB "+dbname,e);
     }
     catch(DatabaseException e) {
-      logf.println("Error removing from DB "+dbname+": "+e);
+      logf.logMsg("Error removing from DB "+dbname,e);
+    }
+  }
+
+  public void get (DatabaseEntry key, DatabaseEntry data) {
+    // ignore operation status
+    try {
+      database.get(null,key,data,null);
+    } catch(DeadlockException e) {
+      logf.logMsg("Deadlock reading from dbname",e);
+    }
+    catch(DatabaseException e) {
+      logf.logMsg("Error reading from DB "+dbname,e);
     }
   }
 

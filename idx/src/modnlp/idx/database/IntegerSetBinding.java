@@ -25,7 +25,7 @@ import java.util.Iterator;
  *  Tuple binding for storing sets of Java ints into a JE database
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: IntegerSetBinding.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: IntegerSetBinding.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  WordPositionTable
 */
 public class IntegerSetBinding extends TupleBinding {

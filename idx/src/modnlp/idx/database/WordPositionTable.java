@@ -21,8 +21,10 @@ import modnlp.idx.inverted.TokenMap;
 
 import com.sleepycat.je.Environment;
 import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.bind.tuple.StringBinding;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.DatabaseNotFoundException;
 import com.sleepycat.je.DeadlockException;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.OperationStatus;
@@ -38,7 +40,7 @@ import com.sleepycat.je.LockMode;
  *  </pre>
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: WordPositionTable.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: WordPositionTable.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 public class WordPositionTable extends Table {
@@ -47,12 +49,11 @@ public class WordPositionTable extends Table {
     super(env,fn,write);
   }
 
-  public void put(StringIntKey sik, IntegerSet set) {
-    TupleBinding kb = new StringIntKeyBinding();
+  public void put(String sik, IntegerSet set) {
     TupleBinding isb = new IntegerSetBinding();
     DatabaseEntry key = new DatabaseEntry();
     DatabaseEntry data = new DatabaseEntry();
-    kb.objectToEntry(sik, key);
+    StringBinding.stringToEntry(sik, key);
     isb.objectToEntry(set, data);
     put(key,data);
   }
@@ -63,32 +64,36 @@ public class WordPositionTable extends Table {
    *
    * @param founo an <code>int</code> value
    */
-  public TokenMap removeFile (int founo) {
+  public TokenMap removeFile () {
     TokenMap tm = null;
     Cursor c = null;
     try {
       tm = new TokenMap();
       c = database.openCursor(null, null);
-      TupleBinding kb = new StringIntKeyBinding();
+      TupleBinding kb = new StringBinding();
       DatabaseEntry key = new DatabaseEntry();
       TupleBinding isb = new IntegerSetBinding();
       DatabaseEntry data = new DatabaseEntry();
       while (c.getNext(key, data, LockMode.DEFAULT) 
              == OperationStatus.SUCCESS) {
-        StringIntKey sik = (StringIntKey) kb.entryToObject(key);
-        if (sik.getInt() == founo) {
-          IntegerSet set  = (IntegerSet) isb.entryToObject(data);
-          tm.put(sik.getString(), set);
-          c.delete();
-        }
+        String sik = (String) kb.entryToObject(key);
+        IntegerSet set  = (IntegerSet) isb.entryToObject(data);
+        tm.put(sik, set);
+        //c.delete();
       }
       c.close();
+      String founo = database.getDatabaseName();
+      database.close();
+      environment.removeDatabase(null,founo);
     }
     catch (DeadlockException e) {
-      logf.println("Deadlock deleting record " + e);
+      logf.logMsg("Deadlock deleting record " + e);
+    }
+    catch (DatabaseNotFoundException e) {
+      logf.logMsg("Error removing wordPositionTable" + e);
     }
     catch (DatabaseException e) {
-      logf.println("Error accessing wordPositionTable" + e);
+      logf.logMsg("Error accessing wordPositionTable" + e);
     }
     finally {
       try{ c.close(); }catch(DatabaseException e){};
@@ -96,23 +101,43 @@ public class WordPositionTable extends Table {
     }
   }
 
+  public IntegerSet fetch (String sik) {
+    TupleBinding isb = new IntegerSetBinding();
+    DatabaseEntry key = new DatabaseEntry();
+    DatabaseEntry data = new DatabaseEntry();
+    IntegerSet set = null;
+    StringBinding.stringToEntry(sik.toLowerCase(), key);
+    try {
+      if (database.get(null,key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) 
+        set = (IntegerSet)isb.entryToObject(data);
+    } catch(DeadlockException e) {
+      logf.logMsg("Deadlock reading from dbname:"+e);
+    }
+    catch(DatabaseException e) {
+      logf.logMsg("Error reading from DB "+dbname+": "+e);
+    }
+    return set;
+  }
+
+
   public void dump () {
     try {
       Cursor c = database.openCursor(null, null);
-      TupleBinding kb = new StringIntKeyBinding();
+      TupleBinding kb = new StringBinding();
       TupleBinding isb = new IntegerSetBinding();
       DatabaseEntry key = new DatabaseEntry();
       DatabaseEntry data = new DatabaseEntry();
+      System.out.println("Word positions for fileno "+database.getDatabaseName()+":");
       while (c.getNext(key, data, LockMode.DEFAULT) == 
              OperationStatus.SUCCESS) {
-        StringIntKey sik = (StringIntKey) kb.entryToObject(key);
+        String sik = (String) kb.entryToObject(key);
         IntegerSet set  = (IntegerSet) isb.entryToObject(data);
         System.out.println(sik+" < "+set+">");
       }
       c.close();
     }
     catch (DatabaseException e) {
-      logf.println("Error accessing wordPositionTable" + e);
+      logf.logMsg("Error accessing wordPositionTable" + e);
     }
   }
 

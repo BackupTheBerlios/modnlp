@@ -21,6 +21,8 @@ import com.sleepycat.je.Environment;
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.StringBinding;
 import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.BtreeStats;
+import com.sleepycat.je.StatsConfig;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.OperationStatus;
@@ -37,7 +39,7 @@ import com.sleepycat.je.LockMode;
  *  </pre>
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: FileTable.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: FileTable.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 public class FileTable extends Table {
@@ -61,6 +63,13 @@ public class FileTable extends Table {
     remove(key);
   }
 
+  public String getFileName(int sik) {
+    DatabaseEntry key = new DatabaseEntry();
+    DatabaseEntry data = new DatabaseEntry();
+    IntegerBinding.intToEntry(sik, key);
+    get(key,data);
+    return StringBinding.entryToString(data);
+  }
 
   public void  dump () {
     try {
@@ -76,7 +85,7 @@ public class FileTable extends Table {
       c.close();
     }
     catch (DatabaseException e) {
-      logf.println("Error accessing FileTable" + e);
+      logf.logMsg("Error accessing FileTable" + e);
     }
   }
 
@@ -101,15 +110,39 @@ public class FileTable extends Table {
           keynum = sik;
         String fou = StringBinding.entryToString(data);
         //System.err.println("++++++++++"+fou+"++++++");
-        if (fou.equals(fn))  // found matching fou
+        if (fou.equals(fn)) { // found matching fou
+          c.close();
           return sik;
+        }
       }
       c.close();
     }
     catch (DatabaseException e) {
-      logf.println("Error accessing FileTable" + e);
+      logf.logMsg("Error accessing FileTable" + e);
     }
     return (-1*(keynum+1));
+  }
+
+  public int [] getKeys () {
+    int [] keys = null;
+    try {
+      StatsConfig stc = new StatsConfig();  // stc.setFast(true);
+      BtreeStats dbs = (BtreeStats)database.getStats(stc);
+      keys = new int[(int)dbs.getLeafNodeCount()];
+      Cursor c = database.openCursor(null, null);
+      DatabaseEntry key = new DatabaseEntry();
+      DatabaseEntry data = new DatabaseEntry();
+      int i = 0;
+      while (c.getNext(key, data, LockMode.DEFAULT) == 
+             OperationStatus.SUCCESS) {
+        keys[i++] = IntegerBinding.entryToInt(key);
+      }
+      c.close();
+    }
+    catch (DatabaseException e) {
+      logf.logMsg("Error accessing FileTable" + e);
+    }
+    return keys;
   }
 
 

@@ -22,13 +22,13 @@ import java.io.InputStream;
  *  Load dictionary defaults
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: DictProperties.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: DictProperties.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 public class DictProperties extends java.util.Properties{
 
   public static String PROP_FNAME = "dictionary.properties";
-  String envHome = "/tmp/dbv1";      // a very unsafe default;
+  String envHome = "/tmp/dbv2";      // a very unsafe default;
   String wPosTableName = "poindex.db";  // word.fileno -> [pos1, pos2, ...]
   String wFilTableName = "wfindex.db";  // word -> [fileno1, fileno2, ...]
   String caseTableName = "caindex.db";  // canonicalform -> [form1, form2, ...]

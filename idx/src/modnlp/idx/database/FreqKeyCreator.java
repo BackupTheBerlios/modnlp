@@ -16,34 +16,32 @@
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package modnlp.idx.database;
+import com.sleepycat.je.SecondaryKeyCreator; 
+import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.SecondaryDatabase;
+import com.sleepycat.bind.tuple.IntegerBinding;
+
+import java.io.IOException; 
+
 
 /**
- *  Encapsulate WordPositionTable's key
+ *  Create key for secondary frequency database (key is frequency)
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: StringIntKey.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
+ * @version <font size=-1>$Id: FreqKeyCreator.java,v 1.1 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 
-public class StringIntKey {
-  String string;
-  int integer; 
+public class FreqKeyCreator implements SecondaryKeyCreator {
 
-  public StringIntKey (String s, int i) {
-    string = s;
-    integer = i;
-  }
-    
-  public String getString () {
-    return string;
-  }
-
-  public int getInt () {
-    return integer;
-  }
-
-  public String toString() {
-    return string+"."+integer;
+  public boolean createSecondaryKey(SecondaryDatabase secDb,
+                                    DatabaseEntry key,
+                                    DatabaseEntry data,                    
+                                    DatabaseEntry result) {
+    int fq = IntegerBinding.entryToInt(data);
+    IntegerBinding.intToEntry(fq,result);
+    return true;
   }
 
 }

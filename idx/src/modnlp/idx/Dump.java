@@ -16,47 +16,32 @@
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package modnlp.idx;
+
 import modnlp.dstruct.CorpusList;
 import modnlp.idx.inverted.TokeniserRegex;
 import modnlp.idx.inverted.TokenMap;
 import modnlp.idx.database.Dictionary;
-import modnlp.idx.database.NotIndexedException;
+import modnlp.idx.database.AlreadyIndexedException;
 
 import java.io.File;
 import java.util.Enumeration;
 
 /**
- *  Read input file(s) and create case, occurrence, position and
- *  frequency tables for use with TEC
+ *  Print dictionary tables onto stdout (for testing purposes)
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: RemoveFileFromIndex.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
+ * @version <font size=-1>$Id: Dump.java,v 1.1 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
-public class RemoveFileFromIndex {
+public class Dump {
   private static boolean verbose = true;
-
 
   public static void main(String[] args) {
     Dictionary d = null;
     try {
-      d = new Dictionary(true); 
-      // RemoveFileFromIndex mti = new RemoveFileFromIndex();
-      CorpusList clist =  new CorpusList(args[0]);
-      for (Enumeration e = clist.elements(); e.hasMoreElements() ;) {
-        try {
-          String fname = (String)e.nextElement();
-          if (verbose) {
-            System.err.print("\n----- De-indexing: "+fname+" ------\n");
-          }
-          d.removeFromDictionary(fname);
-        }
-        catch (NotIndexedException ex){
-          System.err.println("Warning: "+ex);
-          System.err.println("Ignoring this entry.");
-        }
-      } // end for
+      d = new Dictionary(false); 
       d.dump();
+      d.printSortedFreqList(new java.io.PrintWriter(System.out));
       d.close();
     } // end try
     catch (Exception ex){
@@ -71,7 +56,10 @@ public class RemoveFileFromIndex {
 
 
   public static void usage() {
-    System.err.println("\nUSAGE: RemoveFileFromIndex REMOVE_LIST ");
-    System.err.println("\tRemove each file in REMOVE_LIST from index");
+    System.err.println("\nUSAGE: Dump ");
+    System.err.println("\tprint modnlp.idx.Dictionary tables to stdout");
+    System.err.println("\tOptions:");
+    System.err.println("\t\t-f       print frequency list");
+    System.err.println("\t\t-q QUERY query dictionary");
   }
 }

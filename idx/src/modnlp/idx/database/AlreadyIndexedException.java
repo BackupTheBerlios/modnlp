@@ -21,7 +21,7 @@ package modnlp.idx.database;
  *  Indicate that file or URI has already been added to the index.
  *
  * @author  S Luz &#60;luzs@cs.tcd.ie&#62;
- * @version <font size=-1>$Id: AlreadyIndexedException.java,v 1.1 2006/05/22 16:55:04 amaral Exp $</font>
+ * @version <font size=-1>$Id: AlreadyIndexedException.java,v 1.2 2006/05/22 17:26:02 amaral Exp $</font>
  * @see  
 */
 
